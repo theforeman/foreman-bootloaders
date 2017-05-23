@@ -1,0 +1,9 @@
+local.conf
+redhat/*.rpm
+fedora/*.rpm
+redhat/boot
+redhat/usr
+fedora/boot
+fedora/usr
+tftpboot/
+*.tar.bz2
