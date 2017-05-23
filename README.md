@@ -29,13 +29,32 @@ Download from dist/ directory in this git repository.
 * grub2/grubppc64le.elf - Grub2 bootloader for PPC64LE
 * grub2/grubppc64.efi - symlink to ELF (*)
 * grub2/grubppc64le.efi - symlink to ELF (*)
-* grub2/shimx64.efi - SHIM SecureBoot loader for x86-64
-* grub2/shimia32.efi - SHIM SecureBoot loader for i386
-* grub2/shimiaa64.efi - SHIM SecureBoot loader for ARM64
+* grub2/shimx64.efi - SHIM SecureBoot loader for x86-64 signed with UEFI SA
+* grub2/shimia32.efi - SHIM SecureBoot loader for i386 signed with UEFI SA
+* grub2/shimiaa64.efi - SHIM SecureBoot loader for ARM64 signed with UEFI SA
 * grub/bootx64.efi - Grub bootloader for x86-64
 * grub/bootia32.efi - Grub bootloader for i386
 
+We also include SHIM SecureBoot loaders signed by Red Hat or Fedora keys, in
+order to use them you need to upload CA certificate into UEFI firmware. These
+are for RHEL builds:
+
+* grub2/shimx64-redhat.efi
+* grub2/shimia32-redhat.efi
+* grub2/shimiaa64-redhat.efi
+
+And for Fedora builds:
+
+* grub2/shimx64-fedora.efi
+* grub2/shimia32-fedora.efi
+* grub2/shimiaa64-fedora.efi
+
 (*) - this is a workaround for Foreman 1.13-1.15 (will be removed in the future)
+
+We do not ship PXELinux for now, there hasn't been a release for several years
+in upstream and last version 6.04 does not work well in UEFI. Nightly builds
+look better and there's been some activity, hopefully once new release is done
+we can include PXELinux both BIOS and UEFI once it gets into Fedora Rawhide.
 
 ## Which one to pick
 
