@@ -85,6 +85,12 @@ download packages from Fedora Koji or Brew and use script called `extract` to
 generate tarballs. If you don't have access to Koji instance, RPM packages can
 be downloaded manually, their names are stored in package-list.txt files.
 
+## UEFI in 32bit mode
+
+Some cheap systems have 32bit UEFI while the hardware is 64bit capable. For
+this reason, we ship shimia32.efi which is compatible, make sure to select
+ix86 architecture in Foreman for the particular host when provisioning it.
+
 ## Ubuntu and Debian support
 
 We currently do not provide loaders from these distributions for two reasons.
@@ -103,6 +109,97 @@ but only for Grub2 (shim-signed, grub-efi-amd64-signed).
 Since loaders from Red Hat distributions work well with Ubuntu or Debian
 clients, we decided not to ship them for now. Feel free to contribute builds
 from other distributions.
+
+## Which shim version to use
+
+This chapter was written by Laszlo Ersek from Red Hat engineering as a
+blueprint how to identify and verify signatures in shim bootloaders.
+
+For "shim.efi" (on RHEL-7.3), "pesign" prints:
+
+    $ pesign --show-signature --in=/boot/efi/EFI/redhat/shim.efi
+    ---------------------------------------------
+    certificate address is 0x7f2c4a001380
+    Content was not encrypted.
+    Content is detached; signature cannot be verified.
+    The signer's common name is Microsoft Windows UEFI Driver Publisher
+    No signer email address.
+    No signing time included.
+    There were certs or crls included.
+    ---------------------------------------------
+
+For "shim.efi", "sbverify" prints:
+
+    $ sbverify --no-verify --verbose /boot/efi/EFI/redhat/shim.efi
+    warning: data remaining[1175520 vs 1295704]: gaps between PE/COFF sections?
+    image signature issuers:
+     - /C=US/ST=Washington/L=Redmond/O=Microsoft Corporation/CN=Microsoft Corporation UEFI CA 2011
+    image signature certificates:
+     - subject: /C=US/ST=Washington/L=Redmond/O=Microsoft Corporation/OU=MOPR/CN=Microsoft Windows UEFI Driver Publisher
+       issuer:  /C=US/ST=Washington/L=Redmond/O=Microsoft Corporation/CN=Microsoft Corporation UEFI CA 2011
+     - subject: /C=US/ST=Washington/L=Redmond/O=Microsoft Corporation/CN=Microsoft Corporation UEFI CA 2011
+       issuer:  /C=US/ST=Washington/L=Redmond/O=Microsoft Corporation/CN=Microsoft Corporation Third Party Marketplace Root
+    certificate store:
+    Signature verification OK
+
+So, the "shim.efi" binary was signed with the private key of
+
+    Microsoft Windows UEFI Driver Publisher
+
+The certificate for that entity was issued by
+
+    Microsoft Corporation UEFI CA 2011
+
+which in turn was issued by
+
+    Microsoft Corporation Third Party Marketplace Root
+
+The certificate that belongs to "Microsoft Corporation UEFI CA 2011" is
+expected to be present in the "db" authenticated non-volatile UEFI
+variable (= "authorized signature database") on all systems that passed
+the Windows Logo certification, and so they will accept "shim.efi".
+
+For "shim-redhat.efi", "pesign" prints:
+
+    $ pesign --show-signature --in=/boot/efi/EFI/redhat/shim-redhat.efi
+    ---------------------------------------------
+    certificate address is 0x7f0800e01380
+    Content was not encrypted.
+    Content is detached; signature cannot be verified.
+    The signer's common name is Red Hat Secure Boot (signing key 1)
+    The signer's email address is secalert@redhat.com
+    Signing time: Mon Jul 20, 2015
+    There were certs or crls included.
+    ---------------------------------------------
+
+For "shim-redhat.efi", "sbverify" prints:
+
+    $ sbverify --no-verify --verbose /boot/efi/EFI/redhat/shim-redhat.efi
+    warning: data remaining[1169360 vs 1289544]: gaps between PE/COFF sections?
+    image signature issuers:
+     - /CN=Red Hat Secure Boot (CA key 1)/emailAddress=secalert@redhat.com
+    image signature certificates:
+     - subject: /CN=Red Hat Secure Boot (signing key 1)/emailAddress=secalert@redhat.com
+       issuer:  /CN=Red Hat Secure Boot (CA key 1)/emailAddress=secalert@redhat.com
+     - subject: /CN=Red Hat Secure Boot (CA key 1)/emailAddress=secalert@redhat.com
+       issuer:  /CN=Red Hat Secure Boot (CA key 1)/emailAddress=secalert@redhat.com
+    certificate store:
+    Signature verification OK
+
+So, in this case the binary was signed with the private key of
+
+    Red Hat Secure Boot (signing key 1)
+
+whose certificate was issued by
+
+    Red Hat Secure Boot (CA key 1)
+
+whose self-signed certificate is what we terminate the certificate chain
+with.
+
+On a Windows Logo-carrying machine, "shim.efi" can be used. Otherwise, you
+could decide to trust Red Hat, and enroll the "Red Hat Secure Boot (CA key 1)"
+cert in "db" manually. Then "shim-redhat.efi" would be accepted again.
 
 ## Contribute
 
