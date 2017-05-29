@@ -7,3 +7,4 @@ fedora/boot
 fedora/usr
 tftpboot/
 *.tar.bz2
+publish.sh

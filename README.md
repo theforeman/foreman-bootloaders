@@ -19,7 +19,9 @@ Each source distribution supports different combination of architectures.
 
 ## Download
 
-Download from dist/ directory in this git repository.
+Download packages from
+
+http://downloads.theforeman.org/foreman-bootloaders/
 
 ## Shipped bootloaders
 
