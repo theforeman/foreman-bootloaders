@@ -33,7 +33,7 @@ dist() {
   local TAG=$1
   chmod 644 tftpboot/{grub,grub2}/*
   OUTPUT=dist/foreman-bootloaders-$TAG-${TODAY}.tar.bz2
-  tar -cjf $OUTPUT tftpboot/
+  tar --sort=name -cjf $OUTPUT tftpboot/
   echo "Created $OUTPUT"
   cleanup
 }
