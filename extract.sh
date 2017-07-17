@@ -31,7 +31,7 @@ extract() {
 
 dist() {
   local TAG=$1
-  chmod 644 tftpboot/{grub,grub2}/*
+  chmod 644 tftpboot/{grub,grub2}/* 2>/dev/null || true
   OUTPUT=dist/foreman-bootloaders-$TAG-${TODAY}.tar.bz2
   tar --sort=name -cjf $OUTPUT tftpboot/
   echo "Created $OUTPUT"
@@ -85,6 +85,10 @@ for A in ppc64 ppc64le; do
 done
 extract $DIST x86_64 ./boot/efi/EFI/$DIST/grub.efi
 mv ./$DIST/boot/efi/EFI/$DIST/grub.efi tftpboot/grub/grubx64.efi
+# Foreman expects grub under this naming convention
+ln -sf grubx64.efi tftpboot/grub/bootx64.efi
 extract $DIST i686 ./boot/efi/EFI/$DIST/grub.efi
 mv ./$DIST/boot/efi/EFI/$DIST/grub.efi tftpboot/grub/grubia32.efi
+# Foreman expects grub under this naming convention
+ln -sf grubia32.efi tftpboot/grub/bootia32.efi
 dist $DIST
