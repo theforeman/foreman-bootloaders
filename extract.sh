@@ -60,8 +60,10 @@ for A in ppc64 ppc64le; do
 done
 extract $DIST x86_64 ./boot/efi/EFI/redhat/grub.efi
 mv ./$DIST/boot/efi/EFI/redhat/grub.efi tftpboot/grub/grubx64.efi
+ln -sf grubx64.efi tftpboot/grub/bootx64.efi
 extract $DIST i686 ./boot/efi/EFI/redhat/grub.efi
 mv ./$DIST/boot/efi/EFI/redhat/grub.efi tftpboot/grub/grubia32.efi
+ln -sf grubia32.efi tftpboot/grub/bootia32.efi
 dist $DIST
 
 DIST=redhat
@@ -85,10 +87,8 @@ for A in ppc64 ppc64le; do
 done
 extract $DIST x86_64 ./boot/efi/EFI/$DIST/grub.efi
 mv ./$DIST/boot/efi/EFI/$DIST/grub.efi tftpboot/grub/grubx64.efi
-# Foreman expects grub under this naming convention
 ln -sf grubx64.efi tftpboot/grub/bootx64.efi
 extract $DIST i686 ./boot/efi/EFI/$DIST/grub.efi
 mv ./$DIST/boot/efi/EFI/$DIST/grub.efi tftpboot/grub/grubia32.efi
-# Foreman expects grub under this naming convention
 ln -sf grubia32.efi tftpboot/grub/bootia32.efi
 dist $DIST
