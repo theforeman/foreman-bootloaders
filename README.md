@@ -1,3 +1,9 @@
+WARNING: These bootloaders were used in Foreman 1.15-1.16 and are no longer in
+active use or development. Foreman installer now generates grub2 image via
+`grub2-mknetdir` command and it is possible to do this on Red Hat systems for
+multiple architectures. Other bootloaders like grub1 or pxelinux must be
+acquired from upstream projects.
+
 # Foreman PXE bootloaders
 
 This repository contains distribution packages and scripts to generate tarball
